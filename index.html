@@ -1,11 +1,374 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Satellite-Based Flood Detection System</title>
-    </head>
-    <body>
-        <h1>This is an FYP 1 Project</h1>
-        <p>Authors: Imran Azuhar, Iqbal Zulfikri</p>
-        <p>letsgo fyp</p>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite-Based Flood Detection | Paddy Fields Monitoring System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>FloodDetect<span class="highlight">Paddy</span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#detection">Detection</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Satellite-Based Flood Detection in <span class="highlight">Paddy Fields</span></h1>
+                <p>Using Machine Learning and Remote Sensing Data to protect farmers and ensure food security across Malaysia.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToDetection()">
+                        <i class="fas fa-cloud-upload-alt"></i> Start Detection
+                    </button>
+                    <button class="btn btn-outline" onclick="scrollToDashboard()">
+                        <i class="fas fa-chart-line"></i> View Dashboard
+                    </button>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number">87%</span>
+                        <span class="stat-label">Detection Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">5-10m</span>
+                        <span class="stat-label">Resolution</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">Real-time</span>
+                        <span class="stat-label">Monitoring</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+    <img src="images/satellite-image.jpg" alt="Satellite imagery of paddy fields" class="hero-img">
+</div>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="section-header">
+                <h2>Flood Monitoring <span class="highlight">Dashboard</span></h2>
+                <p>Real-time flood detection results for paddy fields in Malaysia</p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <!-- Map Card -->
+                <div class="card map-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-map-marked-alt"></i> Flood Map - Paddy Fields</h3>
+                        <div class="legend">
+                            <span><i class="fas fa-square" style="color: #2196F3;"></i> Water/Flooded</span>
+                            <span><i class="fas fa-square" style="color: #4CAF50;"></i> Normal Paddy</span>
+                            <span><i class="fas fa-square" style="color: #FF9800;"></i> High Risk</span>
+                        </div>
+                    </div>
+                    <div class="map-container" id="floodMap">
+                        <canvas id="mapCanvas" width="800" height="500"></canvas>
+                        <div class="map-overlay">
+                            <p><i class="fas fa-location-dot"></i> Kedah, Perlis, Southern Thailand</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Stats Card -->
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Detection Statistics</h3>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stat-circle-container">
+                            <div class="stat-circle">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="10"/>
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#2196F3" stroke-width="10" 
+                                            stroke-dasharray="283" stroke-dashoffset="85" class="circular-chart"/>
+                                </svg>
+                                <div class="circle-text">
+                                    <span class="percentage">70%</span>
+                                    <span class="label">Flooded Area</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats-list">
+                            <div class="stat-item">
+                                <span class="stat-name">Total Monitored Area</span>
+                                <span class="stat-value">12,450 ha</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-name">Flooded Paddy</span>
+                                <span class="stat-value danger">8,715 ha</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-name">Affected Farmers</span>
+                                <span class="stat-value">~3,200</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-name">Last Update</span>
+                                <span class="stat-value" id="lastUpdate">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Performance Card -->
+                <div class="card performance-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-brain"></i> ML Model Performance</h3>
+                    </div>
+                    <div class="performance-bars">
+                        <div class="metric">
+                            <span>Accuracy <i class="fas fa-info-circle" title="Model accuracy on test data"></i></span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 87%">87%</div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span>Precision</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 84%">84%</div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span>Recall</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 82%">82%</div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span>F1-Score</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 83%">83%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="model-info">
+                        <p><i class="fas fa-chart-line"></i> <strong>Model:</strong> Logistic Regression</p>
+                        <p><i class="fas fa-database"></i> <strong>Features:</strong> NDWI, SAR Backscatter, VH/VV Ratio</p>
+                    </div>
+                </div>
+
+                <!-- Recent Alerts Card -->
+                <div class="card alerts-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bell"></i> Recent Flood Alerts</h3>
+                        <button class="refresh-btn" onclick="refreshAlerts()"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <div class="alerts-list" id="alertsList">
+                        <div class="alert-item high">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="alert-info">
+                                <strong>Kubang Pasu, Kedah</strong>
+                                <p>Severe flooding detected - 250 hectares affected</p>
+                                <small><i class="far fa-clock"></i> 2 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="alert-item medium">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="alert-info">
+                                <strong>Perlis - Chuping</strong>
+                                <p>Moderate flooding - Water levels rising</p>
+                                <small><i class="far fa-clock"></i> 5 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="alert-item low">
+                            <i class="fas fa-info-circle"></i>
+                            <div class="alert-info">
+                                <strong>Pendang, Kedah</strong>
+                                <p>Early flood warning issued</p>
+                                <small><i class="far fa-clock"></i> 12 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detection Section -->
+    <section id="detection" class="detection">
+        <div class="container">
+            <div class="section-header">
+                <h2>Flood <span class="highlight">Detection System</span></h2>
+                <p>Upload satellite imagery or select region for analysis</p>
+            </div>
+            
+            <div class="detection-container">
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Satellite Image</h3>
+                    <p>Drag & drop or click to select Sentinel-1/Sentinel-2 imagery</p>
+                    <input type="file" id="imageUpload" accept="image/*,.tif,.jpg,.png" hidden>
+                    <button class="btn btn-secondary" onclick="document.getElementById('imageUpload').click()">
+                        <i class="fas fa-folder-open"></i> Choose File
+                    </button>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <!-- Or Divider -->
+                <div class="or-divider">
+                    <span>OR</span>
+                </div>
+
+                <!-- Region Selection -->
+                <div class="region-select">
+                    <h3><i class="fas fa-map-marker-alt"></i> Select Region</h3>
+                    <select id="regionSelect">
+                        <option value="">-- Select a paddy field region --</option>
+                        <option value="kedah">Kedah - MADA Region</option>
+                        <option value="perlis">Perlis - Chuping Valley</option>
+                        <option value="selangor">Selangor - Sekinchan</option>
+                        <option value="kelantan">Kelantan - Ketereh</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="runDetection()" id="detectBtn">
+                        <i class="fas fa-microchip"></i> Run ML Detection
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h3><i class="fas fa-chart-bar"></i> Detection Results</h3>
+                    <div class="confidence-badge">
+                        Confidence: <span id="confidenceScore">87</span>%
+                    </div>
+                </div>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4><i class="fas fa-tint"></i> NDWI Analysis</h4>
+                        <div class="result-value" id="ndwiValue">0.42</div>
+                        <p>Normalized Difference Water Index</p>
+                    </div>
+                    <div class="result-card">
+                        <h4><i class="fas fa-water"></i> Flood Extent</h4>
+                        <div class="result-value" id="floodExtent">2,450</div>
+                        <p>Hectares detected as flooded</p>
+                    </div>
+                    <div class="result-card">
+                        <h4><i class="fas fa-chart-line"></i> Classification</h4>
+                        <div class="result-value" id="classification">Flooded</div>
+                        <p>Predicted by Logistic Regression</p>
+                    </div>
+                    <div class="result-card">
+                        <h4><i class="fas fa-chart-simple"></i> Risk Level</h4>
+                        <div class="result-value risk" id="riskLevel">High</div>
+                        <p>Recommended action needed</p>
+                    </div>
+                </div>
+                <div class="recommendations">
+                    <h4><i class="fas fa-lightbulb"></i> Recommendations</h4>
+                    <ul id="recommendationsList">
+                        <li> Immediate evacuation recommended for low-lying paddy areas</li>
+                        <li> Consider early harvesting for unaffected sections</li>
+                        <li> Alert local agricultural authorities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <h2>About The <span class="highlight">Project</span></h2>
+                    <p>This system is developed as part of a Final Year Project at the Kulliyyah of Information and Communication Technology, Department of Computer Science.</p>
+                    
+                    <div class="project-info">
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>Students</strong>
+                                <p>Muhammad Imran Bin Nor Azuhar (2318281)<br>Muhammad Iqbal Bin Zulfikri (2317077)</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-chalkboard-user"></i>
+                            <div>
+                                <strong>Supervisor</strong>
+                                <p>Dr. Nur-Adib Maspo</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <div>
+                                <strong>Semester</strong>
+                                <p>Semester 2, 2025/2026</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tech-stack">
+                        <h4>Technologies Used</h4>
+                        <div class="tech-icons">
+                            <span><i class="fab fa-python"></i> Python</span>
+                            <span><i class="fas fa-chart-line"></i> Scikit-learn</span>
+                            <span><i class="fas fa-database"></i> NumPy/Pandas</span>
+                            <span><i class="fas fa-map"></i> QGIS</span>
+                            <span><i class="fas fa-satellite"></i> Sentinel-1/2</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="sdg-card">
+                        <i class="fas fa-seedling"></i>
+                        <h3>SDG 2: Zero Hunger</h3>
+                        <p>Supporting food security through early flood detection in paddy fields</p>
+                        <div class="sdg-goals">
+                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>FloodDetectPaddy</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#dashboard">Dashboard</a>
+                    <a href="#detection">Detection</a>
+                    <a href="#about">About</a>
+                </div>
+                <div class="footer-contact" id="contact">
+                    <p><i class="fas fa-envelope"></i> flooddetect@kict.edu.my</p>
+                    <p><i class="fas fa-phone"></i> +603 1234 5678</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Satellite-Based Flood Detection in Paddy Fields | KICT, IIUM</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
 </html>
