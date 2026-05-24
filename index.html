@@ -1,310 +1,543 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satellite-Based Flood Detection | Paddy Fields Monitoring System</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FloodWatch AI | Satellite-Based Flood Detection for Paddy Fields</title>
+  <!-- google Fonts & Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e6f2f9 100%);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      color: #1a2c3e;
+    }
+
+    /* custom scroll */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #d9e6f2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0f5b7a;
+      border-radius: 10px;
+    }
+
+    /* main container */
+    .hero-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* navigation / header */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 0.75rem 0 1.5rem 0;
+      border-bottom: 2px solid rgba(15, 91, 122, 0.15);
+      margin-bottom: 2rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon {
+      background: #0f5b7a;
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 8px 18px rgba(15, 91, 122, 0.2);
+    }
+    .logo-text h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #0f5b7a, #2c9b6e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .logo-text p {
+      font-size: 0.75rem;
+      color: #2c5a6e;
+      font-weight: 500;
+    }
+    .nav-badge {
+      background: rgba(15, 91, 122, 0.1);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0f5b7a;
+      backdrop-filter: blur(4px);
+    }
+
+    /* main two column layout (similar to initial but with flood theme) */
+    .hero-content {
+      display: flex;
+      flex: 1;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .left-col {
+      flex: 1 1 48%;
+      animation: fadeSlideUp 0.9s ease forwards;
+    }
+    .right-col {
+      flex: 1 1 48%;
+      position: relative;
+      min-height: 520px;
+      animation: scaleIn 0.8s ease forwards;
+    }
+
+    /* typography */
+    .badge-flood {
+      display: inline-block;
+      background: #fef3c7;
+      color: #b45309;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      margin-bottom: 1rem;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(2px);
+    }
+    .main-title {
+      font-size: clamp(2.4rem, 7vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+      color: #0a2e3f;
+    }
+    .main-title span {
+      color: #2c9b6e;
+      background: linear-gradient(120deg, #0f5b7a, #2c9b6e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .highlight-flood {
+      color: #e67e22;
+      border-bottom: 3px solid #e67e22;
+      display: inline-block;
+    }
+    .description {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      line-height: 1.5;
+      color: #2c4e62;
+      margin: 1.2rem 0 1.5rem 0;
+      font-weight: 500;
+      max-width: 90%;
+    }
+    .feature-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .feature-chip {
+      background: rgba(255,255,245,0.8);
+      backdrop-filter: blur(4px);
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e5a6e;
+      border: 1px solid rgba(15, 91, 122, 0.3);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .feature-chip .material-symbols-outlined {
+      font-size: 1.2rem;
+      color: #2c9b6e;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.8rem;
+    }
+    .btn-primary {
+      background: #0f5b7a;
+      color: white;
+      padding: 0.9rem 2rem;
+      font-weight: 700;
+      border-radius: 48px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 12px 18px -8px rgba(15, 91, 122, 0.4);
+      border: none;
+      font-size: 1rem;
+    }
+    .btn-primary:hover {
+      background: #0a415a;
+      transform: translateY(-3px);
+      box-shadow: 0 18px 25px -10px rgba(15, 91, 122, 0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #0f5b7a;
+      padding: 0.85rem 2rem;
+      border-radius: 48px;
+      font-weight: 700;
+      color: #0f5b7a;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .btn-outline:hover {
+      background: #0f5b7a10;
+      transform: translateY(-2px);
+    }
+
+    /* right side animations + satellite / paddy visualization */
+    .orbital-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .orbit-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px dashed #2c9b6e;
+      opacity: 0.5;
+      animation: spinSlow 20s linear infinite;
+    }
+    .ring-1 {
+      width: 280px;
+      height: 280px;
+      border-width: 2px;
+      border-color: #0f5b7a;
+      animation-duration: 18s;
+    }
+    .ring-2 {
+      width: 380px;
+      height: 380px;
+      border-color: #e67e22;
+      opacity: 0.35;
+      animation-duration: 28s;
+      animation-direction: reverse;
+    }
+    .ring-3 {
+      width: 200px;
+      height: 200px;
+      border-color: #2c9b6e;
+      animation-duration: 14s;
+      border-style: dotted;
+    }
+    .satellite-img {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      background: #eef4ff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+      z-index: 12;
+      backdrop-filter: blur(2px);
+      border: 2px solid white;
+      background: linear-gradient(145deg, #ffffff, #eef2fc);
+    }
+    .paddy-img {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 18px 28px rgba(0,0,0,0.2);
+      border: 3px solid rgba(255,255,240,0.9);
+      transition: transform 0.3s;
+    }
+    .flood-overlay-icon {
+      position: absolute;
+      bottom: 15%;
+      right: 10%;
+      background: #0f5b7add;
+      backdrop-filter: blur(8px);
+      border-radius: 60px;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.8rem;
+      z-index: 20;
+      font-family: monospace;
+    }
+    /* images positions */
+    .img-1 {
+      top: 15%;
+      left: 5%;
+      width: 130px;
+      height: 130px;
+      object-fit: cover;
+    }
+    .img-2 {
+      bottom: 20%;
+      right: 0%;
+      width: 140px;
+      height: 140px;
+    }
+    .img-3 {
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -40%);
+      width: 150px;
+      height: 150px;
+      z-index: 15;
+      border: 3px solid #fef9e3;
+    }
+    .sat-icon {
+      top: 40%;
+      right: 20%;
+      width: 95px;
+      height: 95px;
+      background: #ffffffdd;
+      backdrop-filter: blur(4px);
+    }
+    .ml-badge {
+      position: absolute;
+      bottom: 5%;
+      left: 5%;
+      background: #e67e22;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: white;
+      display: flex;
+      gap: 8px;
+      z-index: 22;
+    }
+
+    /* keyframes */
+    @keyframes fadeSlideUp {
+      0% { opacity: 0; transform: translateY(30px);}
+      100% { opacity: 1; transform: translateY(0);}
+    }
+    @keyframes scaleIn {
+      0% { opacity: 0; transform: scale(0.92);}
+      100% { opacity: 1; transform: scale(1);}
+    }
+    @keyframes spinSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    .floating {
+      animation: float 5s ease-in-out infinite;
+    }
+    .delay-float {
+      animation-delay: 0.5s;
+    }
+    @media (max-width: 850px) {
+      .hero-wrapper { padding: 1rem; }
+      .left-col, .right-col { flex: 1 1 100%; }
+      .right-col { min-height: 460px; margin-top: 1rem; }
+      .description { max-width: 100%; }
+      .img-1, .img-2, .img-3 { width: 100px; height: 100px; }
+      .img-3 { width: 110px; height: 110px; }
+    }
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: #4f6f7f;
+      border-top: 1px solid #bdd4df;
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-satellite-dish"></i>
-                <span>FloodDetect<span class="highlight">Paddy</span></span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#dashboard">Dashboard</a></li>
-                <li><a href="#detection">Detection</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <div class="mobile-menu">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-    </nav>
-
-    <!-- main section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Satellite-Based Flood Detection in <span class="highlight">Paddy Fields</span></h1>
-                <p>Using Machine Learning and Remote Sensing Data to protect farmers and ensure food security across Malaysia.</p>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToDetection()">
-                        <i class="fas fa-cloud-upload-alt"></i> Start Detection
-                    </button>
-                    <button class="btn btn-outline" onclick="scrollToDashboard()">
-                        <i class="fas fa-chart-line"></i> View Dashboard
-                    </button>
-                </div>
-                <div class="stats">
-                    <div class="stat">
-                        <span class="stat-number">87%</span>
-                        <span class="stat-label">Detection Accuracy</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">5-10m</span>
-                        <span class="stat-label">Resolution</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">Real-time</span>
-                        <span class="stat-label">Monitoring</span>
-                    </div>
-                </div>
-            </div>
-            <div class="hero-image">
-                <div class="satellite-animation">
-                    <i class="fas fa-satellite"></i>
-                    <div class="waves">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="dashboard">
-        <div class="container">
-            <div class="section-header">
-                <h2>Flood Monitoring <span class="highlight">Dashboard</span></h2>
-                <p>Real-time flood detection results for paddy fields in Malaysia</p>
-            </div>
-            
-            <div class="dashboard-grid">
-                <!-- Map Card - Updated for real satellite images -->
-<div class="card map-card">
-    <div class="card-header">
-        <h3><i class="fas fa-map-marked-alt"></i> Flood Map - Paddy Fields</h3>
-        <div class="legend">
-            <span><i class="fas fa-square" style="color: #2196F3;"></i> Water/Flooded</span>
-            <span><i class="fas fa-square" style="color: #4CAF50;"></i> Normal Paddy</span>
-            <span><i class="fas fa-square" style="color: #FF9800;"></i> High Risk</span>
-        </div>
+<div class="hero-wrapper">
+  <div class="navbar">
+    <div class="logo">
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">satellite_alt</span>
+      </div>
+      <div class="logo-text">
+        <h2>FloodWatch AI</h2>
+        <p>Satellite-Based Flood Detection | Paddy Fields</p>
+      </div>
     </div>
-    <div class="map-container" id="floodMap">
-        <!-- Real Satellite Image Area -->
-        <div class="satellite-image-container" id="satelliteImageContainer">
-            <img id="satelliteDisplayImage" src="" alt="Satellite imagery will appear here" class="satellite-display">
-            <div class="placeholder-overlay" id="placeholderOverlay">
-                <i class="fas fa-satellite-dish"></i>
-                <h4>No Satellite Data Loaded</h4>
-                <p>Upload Sentinel-1/Sentinel-2 imagery or select a region to display flood detection results</p>
-                <button class="btn btn-small" onclick="scrollToDetection()">
-                    
-                </button>
-            </div>
-            <div class="map-overlay">
-                <p><i class="fas fa-location-dot"></i> <span id="currentRegion">Kedah, Perlis, Southern Thailand</span></p>
-            </div>
-        </div>
+    <div class="nav-badge">
+      <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">science</span> 
+      Research Project · FYP 2025
     </div>
+  </div>
+
+  <div class="hero-content">
+    <!-- LEFT SIDE: CONTENT BASED ON REPORT -->
+    <div class="left-col">
+      <div class="badge-flood">
+        <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">water_damage</span> 
+        Machine Learning + Remote Sensing
+      </div>
+      <h1 class="main-title">
+        Satellite-Based <br />
+        <span>Flood Detection</span> in <br />
+        <span class="highlight-flood">Paddy Fields</span>
+      </h1>
+      <p class="description">
+        Integrating Sentinel / Landsat imagery with <strong>Logistic Regression</strong> and 
+        <strong>water indices (NDWI)</strong> to automatically classify flooded vs non-flooded 
+        agricultural zones. Faster, scalable, and designed for Malaysia’s rice bowl regions.
+      </p>
+
+      <!-- key features from the report -->
+      <div class="feature-list">
+        <div class="feature-chip"><span class="material-symbols-outlined">radar</span> SAR & Optical Data</div>
+        <div class="feature-chip"><span class="material-symbols-outlined">cloud_upload</span> Google Earth Engine</div>
+        <div class="feature-chip"><span class="material-symbols-outlined">neurology</span> ML: Logistic Regression</div>
+        <div class="feature-chip"><span class="material-symbols-outlined">map</span> Flood/Non-Flood Mapping</div>
+      </div>
+
+      <!-- statistics / report highlights -->
+      <div style="background: #eaf4e8; border-radius: 28px; padding: 0.8rem 1.2rem; margin: 1.2rem 0; display: inline-block;">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+          <div><span style="font-weight: 800; font-size: 1.2rem;">🎯 87%</span><br /><span style="font-size: 0.7rem;">Detection Accuracy (benchmark)</span></div>
+          <div><span style="font-weight: 800; font-size: 1.2rem;">🌾 Perlis, Kedah</span><br /><span style="font-size: 0.7rem;">Primary focus area</span></div>
+          <div><span style="font-weight: 800; font-size: 1.2rem;">🛰️ Sentinel-1/2</span><br /><span style="font-size: 0.7rem;">Satellite sources</span></div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+    <a href="Flood_Detection/html/detection.html" class="btn-primary" id="exploreBtn">
+        <span>Launch Detection Demo</span>
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </a>
+    <a href="#" class="btn-outline" id="methodBtn">
+        <span class="material-symbols-outlined">description</span> Methodology
+    </a>
+</div>
+      <p style="font-size: 0.7rem; margin-top: 1.2rem; opacity: 0.7;">
+        *Prototype for study purpose — based on FYP Report: Satellite-Based Flood Detection in Paddy Fields
+      </p>
+    </div>
+
+    <!-- RIGHT SIDE: VISUAL + SPINNING BORDERS + SATELLITE & PADDY IMAGES (INSPIRED BY REPORT THEME) -->
+    <div class="right-col">
+      <div class="orbital-container">
+        <!-- spinning borders -->
+        <div class="orbit-ring ring-1"></div>
+        <div class="orbit-ring ring-2"></div>
+        <div class="orbit-ring ring-3"></div>
+        
+        <!-- paddy images (simulate flooded and normal paddy fields) -->
+        <img class="paddy-img img-1 floating" 
+             src="https://images.pexels.com/photos/987500/pexels-photo-987500.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop" 
+             alt="Green paddy field" 
+             loading="eager" />
+        <img class="paddy-img img-2 floating delay-float" 
+             src="https://images.pexels.com/photos/158182/rice-terrace-asia-cultivation-158182.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop" 
+             alt="Paddy terrace" />
+        <img class="paddy-img img-3 floating" 
+             src="https://images.pexels.com/photos/956999/morning-rice-field-paddy-rice-956999.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" 
+             alt="Rice field flooded simulation" />
+        
+        <!-- satellite representation -->
+        <div class="satellite-img sat-icon floating">
+          <span class="material-symbols-outlined" style="font-size: 3rem; color: #0f5b7a;">satellite_alt</span>
+        </div>
+        
+        <!-- flood detection visual cue -->
+        <div class="flood-overlay-icon">
+          <span class="material-symbols-outlined" style="font-size: 1rem;">water_drop</span>
+          <span>Flood Risk Zone Detected</span>
+        </div>
+        <div class="ml-badge">
+          <span class="material-symbols-outlined" style="font-size: 1rem;">model_training</span>
+          Logistic Regression | NDWI > 0.3
+        </div>
+        <!-- small annotation about sentinel -->
+        <div style="position: absolute; top: 10%; right: 5%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); border-radius: 20px; padding: 0.2rem 0.8rem; color: white; font-size: 0.7rem;">
+          <span>🛰️ Sentinel-1 SAR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2025 KICT · Bachelor of Computer Science · Supervised by Dr. Nur-Adib Maspo · Project ID: SATELLITE-FLOOD-25</span><br/>
+    <span style="font-size:0.7rem;">In partial fulfillment of Final Year Project | Flood Detection in Paddy Fields using Remote Sensing & ML</span>
+  </footer>
 </div>
 
-                <!-- Detection Stats Card -->
-                <div class="card stats-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-chart-pie"></i> Detection Statistics</h3>
-                    </div>
-                    <div class="stats-content">
-                        <div class="stat-circle-container">
-                            <div class="stat-circle">
-                                <svg viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="10"/>
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#2196F3" stroke-width="10" 
-                                            stroke-dasharray="283" stroke-dashoffset="85" class="circular-chart"/>
-                                </svg>
-                                <div class="circle-text">
-                                    <span class="percentage">70%</span>
-                                    <span class="label">Flooded Area</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stats-list">
-                            <div class="stat-item">
-                                <span class="stat-name">Total Monitored Area</span>
-                                <span class="stat-value">12,450 ha</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-name">Flooded Paddy</span>
-                                <span class="stat-value danger">8,715 ha</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-name">Affected Farmers</span>
-                                <span class="stat-value">~3,200</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-name">Last Update</span>
-                                <span class="stat-value" id="lastUpdate">Just now</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<script>
+  // interactive demo popup to align with report context (show project details)
+  const exploreBtn = document.getElementById('exploreBtn');
+  const methodBtn = document.getElementById('methodBtn');
+  
+  
 
-                <!-- Model Performance Card -->
-                <div class="card performance-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-brain"></i> ML Model Performance</h3>
-                    </div>
-                    <div class="performance-bars">
-                        <div class="metric">
-                            <span>Accuracy <i class="fas fa-info-circle" title="Model accuracy on test data"></i></span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 87%">87%</div>
-                            </div>
-                        </div>
-                        <div class="metric">
-                            <span>Precision</span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 84%">84%</div>
-                            </div>
-                        </div>
-                        <div class="metric">
-                            <span>Recall</span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 82%">82%</div>
-                            </div>
-                        </div>
-                        <div class="metric">
-                            <span>F1-Score</span>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 83%">83%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="model-info">
-                        <p><i class="fas fa-chart-line"></i> <strong>Model:</strong> Logistic Regression</p>
-                        <p><i class="fas fa-database"></i> <strong>Features:</strong> NDWI, SAR Backscatter</p>
-                    </div>
-                </div>
+  exploreBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showProjectInfo('demo');
+  });
+  methodBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showProjectInfo('method');
+  });
 
-                <!-- Recent Alerts Card -->
-                <div class="card alerts-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-bell"></i> Recent Flood Alerts</h3>
-                        <button class="refresh-btn" onclick="refreshAlerts()"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                    <div class="alerts-list" id="alertsList">
-                        <div class="alert-item high">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <div class="alert-info">
-                                <strong>Kubang Pasu, Kedah</strong>
-                                <p>Severe flooding detected - 250 hectares affected</p>
-                                <small><i class="far fa-clock"></i> 2 hours ago</small>
-                            </div>
-                        </div>
-                        <div class="alert-item medium">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <div class="alert-info">
-                                <strong>Perlis - Chuping</strong>
-                                <p>Moderate flooding - Water levels rising</p>
-                                <small><i class="far fa-clock"></i> 5 hours ago</small>
-                            </div>
-                        </div>
-                        <div class="alert-item low">
-                            <i class="fas fa-info-circle"></i>
-                            <div class="alert-info">
-                                <strong>Pendang, Kedah</strong>
-                                <p>Early flood warning issued</p>
-                                <small><i class="far fa-clock"></i> 12 hours ago</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-content">
-                    <h2>About The <span class="highlight">Project</span></h2>
-                    <p>This system is developed as part of a Final Year Project at the Kulliyyah of Information and Communication Technology, Department of Computer Science.</p>
-                    
-                    <div class="project-info">
-                        <div class="info-item">
-                            <i class="fas fa-users"></i>
-                            <div>
-                                <strong>Students</strong>
-                                <p>Muhammad Imran Bin Nor Azuhar (2318281)<br>Muhammad Iqbal Bin Zulfikri (2317077)</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-chalkboard-user"></i>
-                            <div>
-                                <strong>Supervisor</strong>
-                                <p>Dr. Nur-Adib Maspo</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar"></i>
-                            <div>
-                                <strong>Semester</strong>
-                                <p>Semester 2, 2025/2026</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <h4>Technologies Used</h4>
-                        <div class="tech-icons">
-                            <span><i class="fab fa-python"></i> Python</span>
-                            <span><i class="fas fa-chart-line"></i> Scikit-learn</span>
-                            <span><i class="fas fa-database"></i> NumPy/Pandas</span>
-                            <span><i class="fas fa-map"></i> QGIS</span>
-                            <span><i class="fas fa-satellite"></i> Sentinel-1/2</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-image">
-                    <div class="sdg-card">
-                        <i class="fas fa-seedling"></i>
-                        <h3>SDG 2: Zero Hunger</h3>
-                        <p>Supporting food security through early flood detection in paddy fields</p>
-                        <div class="sdg-goals">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <i class="fas fa-satellite-dish"></i>
-                    <span>FloodDetectPaddy</span>
-                </div>
-                <div class="footer-links">
-                    <a href="#home">Home</a>
-                    <a href="#dashboard">Dashboard</a>
-                    <a href="#detection">Detection</a>
-                    <a href="#about">About</a>
-                </div>
-                <div class="footer-contact" id="contact">
-                    <p><i class="fas fa-envelope"></i> testing@kict.edu.my</p>
-                    <p><i class="fas fa-phone"></i> +6018 224 2858</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Satellite-Based Flood Detection in Paddy Fields | KICT, IIUM</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
+  // optional hover effect on rings / image errors fallback
+  const allImgs = document.querySelectorAll('.paddy-img');
+  allImgs.forEach(img => {
+    img.onerror = function() {
+      this.src = 'https://placehold.co/400x400/e9f0e5/2c6e49?text=Paddy+Field';
+      this.style.objectFit = 'cover';
+    };
+  });
+  // add satellite icon fallback
+  const satDiv = document.querySelector('.satellite-img');
+  if(satDiv && !satDiv.querySelector('span')) {
+    // nothing needed
+  }
+  // add additional tooltips: floating effect already
+  console.log('Flood detection homepage based on satellite & paddy fields report');
+</script>
 </body>
 </html>

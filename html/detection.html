@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FloodWatch AI | Detection Dashboard - Paddy Field Monitoring</title>
+  <!-- Google Fonts & Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #eef5f9 0%, #dceaf2 100%);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      color: #1a2c3e;
+    }
+
+    .dashboard-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+    }
+
+    /* header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(15, 91, 122, 0.2);
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon {
+      background: #0f5b7a;
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 8px 18px rgba(15, 91, 122, 0.2);
+    }
+    .logo-text h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0f5b7a, #2c9b6e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .back-btn {
+      background: rgba(15, 91, 122, 0.1);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #0f5b7a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-btn:hover {
+      background: #0f5b7a;
+      color: white;
+    }
+
+    /* main grid */
+    .detection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 900px) {
+      .detection-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .dashboard-wrapper {
+        padding: 1rem;
+      }
+    }
+
+    /* left panel - location selector & info */
+    .location-panel {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(2px);
+      border-radius: 32px;
+      padding: 1.8rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #0f5b7a;
+      border-left: 4px solid #e67e22;
+      padding-left: 1rem;
+    }
+    .location-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .loc-btn {
+      background: white;
+      border: 2px solid #cfdfe8;
+      border-radius: 60px;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.25s;
+      color: #1e4a62;
+    }
+    .loc-btn:hover {
+      border-color: #2c9b6e;
+      background: #eef9f0;
+      transform: translateX(5px);
+    }
+    .loc-btn.active {
+      background: linear-gradient(135deg, #0f5b7a, #1e7a5e);
+      border-color: #0f5b7a;
+      color: white;
+      box-shadow: 0 8px 18px rgba(15, 91, 122, 0.3);
+    }
+    .loc-icon {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .stats-card {
+      background: #e9f2f5;
+      border-radius: 24px;
+      padding: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      border-bottom: 1px dashed #bdd4e0;
+    }
+    .stat-label {
+      font-weight: 600;
+    }
+    .stat-value {
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .warning-badge {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* right panel - satellite imagery & notifications */
+    .satellite-panel {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(2px);
+      border-radius: 32px;
+      padding: 1.8rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+    }
+    .image-container {
+      background: #1a2c3e;
+      border-radius: 28px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      position: relative;
+      aspect-ratio: 16/10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sat-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .image-overlay {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      font-size: 0.7rem;
+      color: white;
+      font-weight: 500;
+    }
+    .flood-notification {
+      background: linear-gradient(105deg, #fff8eb, #fff2df);
+      border-left: 6px solid #e67e22;
+      border-radius: 24px;
+      padding: 1.2rem;
+      margin: 1.2rem 0;
+    }
+    .flood-percentage {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e67e22, #c0392b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .risk-level {
+      display: inline-block;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      margin-top: 0.5rem;
+    }
+    .risk-high { background: #dc2626; color: white; }
+    .risk-moderate { background: #f59e0b; color: white; }
+    .risk-low { background: #10b981; color: white; }
+    .risk-none { background: #6c757d; color: white; }
+
+    .notification-list {
+      margin-top: 1.2rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .notif-item {
+      background: white;
+      border-radius: 18px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e2edf2;
+    }
+    .timestamp {
+      font-size: 0.7rem;
+      color: #6c8d9c;
+    }
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #4f6f7f;
+      padding-top: 1rem;
+      border-top: 1px solid #cbdde6;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      border-top-color: #0f5b7a;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">satellite_alt</span>
+      </div>
+      <div class="logo-text">
+        <h2>FloodWatch AI · Detection Hub</h2>
+        <p style="font-size: 0.7rem;">Real-time satellite inference | Logistic Regression Model</p>
+      </div>
+    </div>
+    <a href="#" id="backHomeBtn" class="back-btn">
+      <span class="material-symbols-outlined">arrow_back</span> Back to Home
+    </a>
+  </div>
+
+  <div class="detection-grid">
+    <!-- LEFT: Location Selection & metadata -->
+    <div class="location-panel">
+      <div class="section-title">
+        <span class="material-symbols-outlined">agriculture</span> Paddy Zone Selector
+      </div>
+      <p style="margin-bottom: 0.5rem; color: #2c5a6e; font-weight: 500;">Select region to analyze flood risk using Sentinel-1 SAR & NDWI:</p>
+      <div class="location-buttons" id="locationButtons">
+        <div class="loc-btn" data-loc="kedah">
+          <span class="loc-icon"><span class="material-symbols-outlined">location_on</span> Kedah, Malaysia</span>
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+        <div class="loc-btn" data-loc="perlis">
+          <span class="loc-icon"><span class="material-symbols-outlined">location_on</span> Perlis, Malaysia</span>
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+        <div class="loc-btn" data-loc="thailand">
+          <span class="loc-icon"><span class="material-symbols-outlined">location_on</span> Southern Thailand (Pattani, Narathiwat)</span>
+          <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- extra region insights -->
+      <div class="stats-card" id="regionStats">
+        <div class="stat-item"><span class="stat-label">🌾 Total Paddy Area</span><span class="stat-value" id="totalArea">—</span></div>
+        <div class="stat-item"><span class="stat-label">📡 Last Satellite Pass</span><span class="stat-value" id="lastPass">—</span></div>
+        <div class="stat-item"><span class="stat-label">🧠 ML Model</span><span class="stat-value">Logistic Regression</span></div>
+        <div class="stat-item"><span class="stat-label">💧 Key Index</span><span class="stat-value">NDWI (threshold 0.25)</span></div>
+      </div>
+      <div class="warning-badge" style="margin-top: 0.8rem;">
+        <span class="material-symbols-outlined">info</span> Based on Sentinel-2 & Landsat-8 fusion
+      </div>
+    </div>
+
+    <!-- RIGHT: Satellite Image & Flood Notifications -->
+    <div class="satellite-panel">
+      <div class="section-title">
+        <span class="material-symbols-outlined">earthquake</span> Flood Risk Analysis
+      </div>
+      
+      <!-- Satellite Image Display -->
+      <div class="image-container" id="satImageContainer">
+        <img id="satelliteImg" class="sat-image" src="" alt="Satellite view of paddy field">
+        <div class="image-overlay" id="imageOverlay">🛰️ Sentinel-2 · False Color Composite</div>
+      </div>
+
+      <!-- Main Flood Alert Card -->
+      <div class="flood-notification" id="floodAlert">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <div>
+            <span class="material-symbols-outlined" style="color: #e67e22;">water_drop</span>
+            <strong style="font-size: 1.1rem;">Current Flood Risk Assessment</strong>
+          </div>
+          <span id="riskBadge" class="risk-level risk-low">Loading...</span>
+        </div>
+        <div style="margin-top: 0.8rem;">
+          <span class="flood-percentage" id="floodPercentage">—</span>
+          <span style="font-weight: 600;"> probability of inundation</span>
+        </div>
+        <p id="floodMessage" style="margin-top: 0.6rem; font-size: 0.9rem;">Select a region to analyze flood probability using ML classification.</p>
+        <div id="ndwiStatus" style="margin-top: 0.5rem; font-size: 0.8rem; background: #fff0db; display: inline-block; padding: 0.2rem 0.8rem; border-radius: 20px;"></div>
+      </div>
+
+      <!-- Real-time Notifications Feed -->
+      <div style="margin-top: 1.2rem;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.8rem;">
+          <span class="material-symbols-outlined">notifications_active</span>
+          <span style="font-weight: 700;">Live Flood Alerts & Recommendations</span>
+        </div>
+        <div id="notificationsList" class="notification-list">
+          <div class="notif-item">📍 Please select a paddy region to generate alerts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <span>© 2025 KICT · FYP: Satellite-Based Flood Detection in Paddy Fields · Supervised by Dr. Nur-Adib Maspo</span><br>
+    <span>Data simulation based on Sentinel-1/2 & ML prediction (Logistic Regression) for Kedah, Perlis, Southern Thailand rice bowls.</span>
+  </footer>
+</div>
+
+<script>
+  // Dataset per location: simulated realistic flood risk percentages, satellite images (actual satellite-style unsplash/pexels that reflect paddy/flood views)
+  // We use high-quality stock images that resemble paddy fields and flood scenarios.
+  const locationData = {
+    kedah: {
+      name: "Kedah, Malaysia",
+      totalArea: "105,000 ha",
+      lastPass: "2025-05-22 04:32 UTC",
+      floodProb: 72,        // percentage
+      riskLevel: "High",
+      riskText: "⚠️ CRITICAL: Widespread flooding detected in paddy clusters. NDWI > 0.38 indicating surface water extent.",
+      ndwiValue: 0.42,
+      recommendations: "Evacuate livestock, pump excess water. Authorities advised to monitor MADA region.",
+      satelliteImg: "https://images.pexels.com/photos/210260/pexels-photo-210260.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop",  // flooded field
+      altText: "Flooded paddy field in Kedah - satellite view"
+    },
+    perlis: {
+      name: "Perlis, Malaysia",
+      totalArea: "28,500 ha",
+      lastPass: "2025-05-23 01:15 UTC",
+      floodProb: 34,
+      riskLevel: "Moderate",
+      riskText: "🌊 Moderate flooding risk:部分地区 waterlogging observed near Chuping. NDWI elevated.",
+      ndwiValue: 0.27,
+      recommendations: "Monitor water levels, prepare drainage systems. Farmers advised to watch next 48h.",
+      satelliteImg: "https://images.pexels.com/photos/1408221/pexels-photo-1408221.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop",  // paddy with some water
+      altText: "Paddy fields in Perlis with partial water"
+    },
+    thailand: {
+      name: "Southern Thailand (Pattani, Narathiwat)",
+      totalArea: "195,000 ha",
+      lastPass: "2025-05-21 18:22 UTC",
+      floodProb: 58,
+      riskLevel: "High",
+      riskText: "⚠️ Heavy monsoon influence, rising water in paddy zones. Risk of flash floods.",
+      ndwiValue: 0.36,
+      recommendations: "Coordination with Thai DLD. Evacuation prep for low-lying paddies.",
+      satelliteImg: "https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop", 
+      altText: "Satellite view of rice fields in Southern Thailand flood conditions"
+    }
+  };
+
+  // Additional fallback images if needed (all working)
+  // For realism, we embed also a simulation message
+  let currentLocation = "kedah";
+
+  // DOM elements
+  const satImage = document.getElementById('satelliteImg');
+  const floodPercentageSpan = document.getElementById('floodPercentage');
+  const riskBadgeSpan = document.getElementById('riskBadge');
+  const floodMessageP = document.getElementById('floodMessage');
+  const ndwiStatusSpan = document.getElementById('ndwiStatus');
+  const notificationsDiv = document.getElementById('notificationsList');
+  const totalAreaSpan = document.getElementById('totalArea');
+  const lastPassSpan = document.getElementById('lastPass');
+  const locationBtns = document.querySelectorAll('.loc-btn');
+
+  function updateRiskClass(level) {
+    riskBadgeSpan.className = 'risk-level';
+    if(level === 'High') riskBadgeSpan.classList.add('risk-high');
+    else if(level === 'Moderate') riskBadgeSpan.classList.add('risk-moderate');
+    else riskBadgeSpan.classList.add('risk-low');
+    riskBadgeSpan.innerText = level + ' Risk';
+  }
+
+  function renderNotifications(locKey, data) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+    const dateStr = now.toLocaleDateString();
+    
+    let alertsHtml = `
+      <div class="notif-item">
+        <span class="material-symbols-outlined" style="color:#e67e22;">science</span>
+        <div style="flex:1"><strong>🧠 ML Inference</strong><br>Logistic Regression predicts flood probability = ${data.floodProb}%</div>
+        <div class="timestamp">${timeStr}</div>
+      </div>
+      <div class="notif-item">
+        <span class="material-symbols-outlined" style="color:#0f5b7a;">satellite_alt</span>
+        <div style="flex:1"><strong>🛰️ Satellite Feature</strong><br>NDWI = ${data.ndwiValue.toFixed(2)} (water index) | VV/VH backscatter anomaly</div>
+        <div class="timestamp">${dateStr}</div>
+      </div>
+      <div class="notif-item">
+        <span class="material-symbols-outlined" style="color:#b45309;">campaign</span>
+        <div style="flex:1"><strong>📢 Recommendation:</strong><br>${data.recommendations}</div>
+        <div class="timestamp">Action required</div>
+      </div>
+    `;
+    if(data.floodProb > 65) {
+      alertsHtml += `<div class="notif-item" style="background:#ffe5e5; border-left: 4px solid #dc2626;">
+        <span class="material-symbols-outlined" style="color:#b91c1c;">warning</span>
+        <div style="flex:1"><strong>EMERGENCY ALERT</strong> — Immediate evacuation recommended for low-lying fields. Contact disaster unit.</div>
+      </div>`;
+    } else if(data.floodProb > 30) {
+      alertsHtml += `<div class="notif-item" style="background:#fff3e0;">
+        <span class="material-symbols-outlined" style="color:#f59e0b;">water_alert</span>
+        <div style="flex:1">⚠️ Precautionary phase: water levels rising. Maintain observation.</div>
+      </div>`;
+    } else {
+      alertsHtml += `<div class="notif-item">
+        <span class="material-symbols-outlined" style="color:#10b981;">grass</span>
+        <div style="flex:1">✅ Flood risk minimal. Suitable for farming activities. Continue monitoring satellite updates.</div>
+      </div>`;
+    }
+    notificationsDiv.innerHTML = alertsHtml;
+  }
+
+  function loadLocation(locationKey) {
+    const data = locationData[locationKey];
+    if(!data) return;
+    currentLocation = locationKey;
+    
+    // update active UI button
+    locationBtns.forEach(btn => {
+      const btnLoc = btn.getAttribute('data-loc');
+      if(btnLoc === locationKey) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+    
+    // update stats panel
+    totalAreaSpan.innerText = data.totalArea;
+    lastPassSpan.innerText = data.lastPass;
+    
+    // update satellite image
+    satImage.src = data.satelliteImg;
+    satImage.alt = data.altText;
+    document.getElementById('imageOverlay').innerHTML = `🛰️ ${data.name} · NDWI = ${data.ndwiValue.toFixed(2)} | ${data.riskLevel} Risk`;
+    
+    // update main flood card
+    floodPercentageSpan.innerText = data.floodProb + '%';
+    floodMessageP.innerText = data.riskText;
+    ndwiStatusSpan.innerText = `💧 Calculated NDWI: ${data.ndwiValue.toFixed(2)} (threshold >0.25 indicates flooding)`;
+    updateRiskClass(data.riskLevel);
+    
+    // add dynamic interpretation effect
+    const prob = data.floodProb;
+    let percentageDesc = '';
+    if(prob >= 70) percentageDesc = 'Severe flooding expected across paddy parcels.';
+    else if(prob >= 45) percentageDesc = 'Moderate to high flood probability, some areas submerged.';
+    else percentageDesc = 'Low flood probability, but stay vigilant.';
+    
+    const fullMsg = `${data.riskText} ${percentageDesc}`;
+    floodMessageP.innerText = fullMsg;
+    
+    // generate notifications
+    renderNotifications(locationKey, data);
+    
+    // optional: trigger console log
+    console.log(`[FloodWatch] Loaded ${data.name} | Flood Risk: ${data.floodProb}% | ML prediction active`);
+  }
+  
+  // add event listeners to location buttons
+  locationBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const loc = btn.getAttribute('data-loc');
+      if(loc === 'kedah') loadLocation('kedah');
+      else if(loc === 'perlis') loadLocation('perlis');
+      else if(loc === 'thailand') loadLocation('thailand');
+    });
+  });
+  
+  // back to home (index)
+  const backHome = document.getElementById('backHomeBtn');
+  backHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = "/index.html";   // back to flood homepage
+  });
+  
+  // initial load: default Kedah
+  loadLocation('kedah');
+  
+  // simulate live update every 45 seconds? optional: just to demonstrate dynamic, we can add a small refresh to show notifications update
+  // not needed but can have mild refresh indicator: demonstrate changing recommendations.
+  // we also add hover effect on satellite
+  satImage.addEventListener('error', () => {
+    satImage.src = "https://placehold.co/800x500/2c5a6e/ffffff?text=Satellite+Imagery+Preview+Flood+Detection";
+  });
+  
+  // Additional manual refresh for percentage (just to show consistent demo)
+  setInterval(() => {
+    if(currentLocation) {
+      // simulate slight NDWI variation? not needed but to show proactivity re-evaluate msg
+      const data = locationData[currentLocation];
+      if(data) {
+        const fakeNewMsg = `[Auto-refresh] ${new Date().toLocaleTimeString()} - ML model confidence stable at ${data.floodProb}% flood probability.`;
+        console.log(fakeNewMsg);
+        // optionally add a silent refresh badge, but not change to avoid confusion. but we can append a temporary note
+        const notifContainer = notificationsDiv;
+        const tempNotif = document.createElement('div');
+        tempNotif.className = 'notif-item';
+        tempNotif.style.background = "#e9f5ff";
+        tempNotif.innerHTML = `<span class="material-symbols-outlined">sync</span><div style="flex:1"><strong>🔄 Model Sync</strong><br>Latest satellite pass confirms ${data.floodProb}% flood risk.</div><div class="timestamp">Just now</div>`;
+        notifContainer.prepend(tempNotif);
+        if(notifContainer.children.length > 5) notifContainer.removeChild(notifContainer.lastChild);
+      }
+    }
+  }, 30000);
+</script>
+</body>
+</html>
