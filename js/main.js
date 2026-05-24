@@ -579,6 +579,164 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
 });
 
+// Display real satellite image on map
+function displaySatelliteImage(imageDataUrl, regionName) {
+    const satelliteImg = document.getElementById('satelliteDisplayImage');
+    const placeholder = document.getElementById('placeholderOverlay');
+    const regionSpan = document.getElementById('currentRegion');
+    
+    if (satelliteImg && placeholder) {
+        // Show the image
+        satelliteImg.src = imageDataUrl;
+        satelliteImg.classList.add('active');
+        
+        // Hide placeholder
+        placeholder.classList.add('hide');
+        
+        // Update region text
+        if (regionSpan && regionName) {
+            regionSpan.textContent = regionName;
+        }
+        
+        showNotification('Satellite image loaded successfully!', 'success');
+    }
+}
+
+// Clear satellite image (reset to blank)
+function clearSatelliteImage() {
+    const satelliteImg = document.getElementById('satelliteDisplayImage');
+    const placeholder = document.getElementById('placeholderOverlay');
+    
+    if (satelliteImg && placeholder) {
+        satelliteImg.src = '';
+        satelliteImg.classList.remove('active');
+        placeholder.classList.remove('hide');
+    }
+}
+
+// Update the existing runDetection function to display real data
+async function runDetection() {
+    const detectBtn = document.getElementById('detectBtn');
+    const regionSelect = document.getElementById('regionSelect');
+    const region = regionSelect.value;
+    
+    if (!region) {
+        showNotification('Please select a region first!', 'warning');
+        return;
+    }
+    
+    // Show loading on map
+    showMapLoading(true);
+    
+    // Show loading state
+    const originalBtnText = detectBtn.innerHTML;
+    detectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    detectBtn.disabled = true;
+    
+    // Simulate ML processing
+    setTimeout(() => {
+        const results = generateDetectionResults(region);
+        displayResults(results);
+        
+        // Simulate loading a real satellite image
+        // In production, this would come from your backend
+        const demoImageUrl = getDemoImageForRegion(region);
+        displaySatelliteImage(demoImageUrl, results.region_name || region);
+        
+        addNewAlert(region, results);
+        
+        detectBtn.innerHTML = originalBtnText;
+        detectBtn.disabled = false;
+        showMapLoading(false);
+        
+        showNotification('Detection completed successfully!', 'success');
+        
+        const resultsSection = document.getElementById('resultsSection');
+        if (resultsSection) {
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 2500);
+}
+
+// Get demo image for region (replace with your actual images)
+function getDemoImageForRegion(region) {
+    // You can replace these with paths to your actual satellite images
+    const demoImages = {
+        'kedah': 'images/kedah-satellite.jpg',
+        'perlis': 'images/perlis-satellite.jpg',
+        'selangor': 'images/selangor-satellite.jpg',
+        'kelantan': 'images/kelantan-satellite.jpg'
+    };
+    
+    // Return demo image or empty if not found
+    return demoImages[region] || '';
+}
+
+// Show/hide map loading indicator
+function showMapLoading(show) {
+    const mapContainer = document.querySelector('.map-container');
+    if (!mapContainer) return;
+    
+    let loadingElement = document.querySelector('.map-loading');
+    
+    if (show) {
+        if (!loadingElement) {
+            loadingElement = document.createElement('div');
+            loadingElement.className = 'map-loading';
+            loadingElement.innerHTML = '<div class="spinner"></div><p>Loading satellite data...</p>';
+            loadingElement.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                color: white;
+            `;
+            mapContainer.appendChild(loadingElement);
+        }
+    } else {
+        if (loadingElement) {
+            loadingElement.remove();
+        }
+    }
+}
+
+// Handle file upload for real satellite image
+function handleFile(file) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/tiff', 'image/jpg'];
+    
+    if (!allowedTypes.includes(file.type) && !file.name.endsWith('.tif')) {
+        showNotification('Please upload a valid satellite image (JPEG, PNG, TIFF)', 'warning');
+        return;
+    }
+    
+    const fileInfo = document.getElementById('fileInfo');
+    if (fileInfo) {
+        fileInfo.innerHTML = `
+            <i class="fas fa-check-circle" style="color: #4CAF50"></i>
+            File selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+        `;
+        fileInfo.style.color = '#4CAF50';
+        fileInfo.style.marginTop = '15px';
+    }
+    
+    // Display the uploaded image on the map
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        displaySatelliteImage(e.target.result, 'Uploaded Satellite Image');
+    };
+    reader.readAsDataURL(file);
+    
+    showNotification('Satellite image uploaded successfully! Ready for analysis.', 'success');
+}
+
 // Export functions for global access
 window.runDetection = runDetection;
 window.refreshAlerts = refreshAlerts;
