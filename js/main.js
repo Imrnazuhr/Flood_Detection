@@ -737,6 +737,148 @@ function handleFile(file) {
     showNotification('Satellite image uploaded successfully! Ready for analysis.', 'success');
 }
 
+// =========================
+// LEAFLET MAP INITIALIZATION
+// =========================
+
+const map = L.map('map').setView([4.2105, 101.9758], 6);
+
+L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution: '&copy; OpenStreetMap'
+  }
+).addTo(map);
+
+let currentSatelliteLayer = null;
+let currentDownloadURL = null;
+
+// =========================
+// SEARCH LOCATION FUNCTION
+// =========================
+
+async function searchFloodLocation() {
+
+  const location = document
+    .getElementById('locationSearch')
+    .value;
+
+  if(!location) {
+    alert("Please enter location");
+    return;
+  }
+
+  // loading state
+  floodPercentageSpan.innerText = "...";
+  floodMessageP.innerText = 
+    "Connecting to Google Earth Engine...";
+
+  try {
+
+    const response = await fetch(
+      'http://127.0.0.1:5000/search-location',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+          location: location
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    // remove previous satellite layer
+    if(currentSatelliteLayer) {
+      map.removeLayer(currentSatelliteLayer);
+    }
+
+    // add Earth Engine tiles
+    currentSatelliteLayer = L.tileLayer(
+      data.tile_url,
+      {
+        attribution: 'Google Earth Engine'
+      }
+    ).addTo(map);
+
+    // fly to searched location
+    map.setView(
+      [data.latitude, data.longitude],
+      10
+    );
+
+    // save tif download url
+    currentDownloadURL = data.download_url;
+
+    // update UI
+    floodPercentageSpan.innerText =
+      data.flood_probability + "%";
+
+    floodMessageP.innerText =
+      "Real-time Sentinel-1 flood analysis generated from Google Earth Engine.";
+
+    ndwiStatusSpan.innerText =
+      "NDWI = " + data.ndwi;
+
+    updateRiskClass(data.risk_level);
+
+    renderNotifications('dynamic', {
+      floodProb: data.flood_probability,
+      ndwiValue: data.ndwi,
+      recommendations: data.recommendation
+    });
+
+  } catch(error) {
+
+    console.error(error);
+
+    floodMessageP.innerText =
+      "Earth Engine connection failed.";
+
+  }
+}
+
+// =========================
+// SEARCH BUTTON
+// =========================
+
+document
+  .getElementById('searchBtn')
+  .addEventListener(
+    'click',
+    searchFloodLocation
+  );
+
+// ENTER KEY SUPPORT
+document
+  .getElementById('locationSearch')
+  .addEventListener('keypress', function(e) {
+
+    if(e.key === 'Enter') {
+      searchFloodLocation();
+    }
+
+});
+
+// =========================
+// DOWNLOAD TIFF
+// =========================
+
+document
+  .getElementById('downloadTifBtn')
+  .addEventListener('click', () => {
+
+    if(currentDownloadURL) {
+      window.open(currentDownloadURL);
+    } else {
+      alert("No GeoTIFF available yet.");
+    }
+
+});
+
 // Export functions for global access
 window.runDetection = runDetection;
 window.refreshAlerts = refreshAlerts;

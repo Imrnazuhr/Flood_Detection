@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>FloodSat | Detection Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Material Symbols -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+  />
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      background:linear-gradient(135deg,#eef5f9 0%,#dceaf2 100%);
+      font-family:'Inter',sans-serif;
+      min-height:100vh;
+      color:#1a2c3e;
+    }
+
+    .dashboard-wrapper{
+      max-width:1400px;
+      margin:auto;
+      padding:1.5rem 2rem;
+    }
+
+    .dashboard-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:2rem;
+      padding-bottom:1rem;
+      border-bottom:2px solid rgba(15,91,122,0.2);
+    }
+
+    .logo-area{
+      display:flex;
+      align-items:center;
+      gap:1rem;
+    }
+
+    .logo-icon{
+      width:50px;
+      height:50px;
+      background:#0f5b7a;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+    }
+
+    .logo-text h2{
+      font-size:1.7rem;
+      font-weight:800;
+    }
+
+    .detection-grid{
+      display:grid;
+      grid-template-columns:1fr 1.2fr;
+      gap:2rem;
+    }
+
+    @media(max-width:900px){
+      .detection-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .panel{
+      background:white;
+      border-radius:30px;
+      padding:1.8rem;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .section-title{
+      font-size:1.4rem;
+      font-weight:700;
+      margin-bottom:1rem;
+      color:#0f5b7a;
+    }
+
+    .search-wrapper{
+      margin-top:1rem;
+      margin-bottom:1rem;
+    }
+
+    .search-box{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:white;
+      border:2px solid #dbe7ee;
+      border-radius:60px;
+      padding:0.5rem;
+    }
+
+    .search-box input{
+      flex:1;
+      border:none;
+      outline:none;
+      padding:0.9rem 1rem;
+      font-size:1rem;
+    }
+
+    .search-btn{
+      background:linear-gradient(135deg,#0f5b7a,#1e7a5e);
+      color:white;
+      border:none;
+      padding:0.9rem 1.3rem;
+      border-radius:50px;
+      font-weight:700;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .download-btn{
+      width:100%;
+      margin-top:1rem;
+      background:#1e293b;
+      color:white;
+      border:none;
+      border-radius:18px;
+      padding:1rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .image-container{
+      width:100%;
+      height:500px;
+      border-radius:25px;
+      overflow:hidden;
+      margin-bottom:1.5rem;
+    }
+
+    #map{
+      width:100%;
+      height:100%;
+    }
+
+    .flood-card{
+      background:linear-gradient(135deg,#fff8eb,#fff2df);
+      border-left:6px solid #e67e22;
+      border-radius:24px;
+      padding:1.2rem;
+    }
+
+    .flood-percentage{
+      font-size:2.4rem;
+      font-weight:800;
+      color:#e67e22;
+    }
+
+    .risk-level{
+      display:inline-block;
+      padding:0.3rem 1rem;
+      border-radius:30px;
+      font-size:0.8rem;
+      font-weight:700;
+      margin-top:0.5rem;
+      color:white;
+    }
+
+    .risk-high{
+      background:#dc2626;
+    }
+
+    .risk-moderate{
+      background:#f59e0b;
+    }
+
+    .risk-low{
+      background:#10b981;
+    }
+
+    .notification-list{
+      margin-top:1rem;
+    }
+
+    .notif-item{
+      background:white;
+      border-radius:16px;
+      padding:1rem;
+      margin-bottom:0.8rem;
+      box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+
+    <div class="logo-area">
+
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">
+          satellite_alt
+        </span>
+      </div>
+
+      <div class="logo-text">
+        <h2>FloodSat</h2>
+        <p>Google Earth Engine Flood Detection</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="detection-grid">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+
+      <div class="section-title">
+        Search Flood Location
+      </div>
+
+      <p>
+        Search any location to retrieve Sentinel-1
+        satellite imagery from Google Earth Engine.
+      </p>
+
+      <!-- SEARCH -->
+      <div class="search-wrapper">
+
+        <div class="search-box">
+
+          <input
+            type="text"
+            id="locationSearch"
+            placeholder="Search location "
+          />
+
+          <button class="search-btn" id="searchBtn">
+
+            <span class="material-symbols-outlined">
+              search
+            </span>
+
+            Search
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- DOWNLOAD TIFF -->
+      <button class="download-btn" id="downloadTifBtn">
+
+        Download GeoTIFF (.tif)
+
+      </button>
+
+      <!-- RESULT -->
+      <div
+        class="flood-card"
+        style="margin-top:1.5rem;"
+      >
+
+        <h3>Flood Detection Result</h3>
+
+        <div
+          class="flood-percentage"
+          id="floodPercentage"
+        >
+          --
+        </div>
+
+        <div
+          id="riskBadge"
+          class="risk-level risk-low"
+        >
+          Waiting
+        </div>
+
+        <p
+          id="floodMessage"
+          style="margin-top:1rem;"
+        >
+          Search a location to start analysis.
+        </p>
+
+        <div
+          id="ndwiStatus"
+          style="
+            margin-top:1rem;
+            font-weight:600;
+          "
+        >
+        </div>
+
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div
+        class="notification-list"
+        id="notificationsList"
+      >
+
+        <div class="notif-item">
+          Waiting for satellite analysis...
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+
+      <div class="section-title">
+        Satellite Map Visualization
+      </div>
+
+      <div class="image-container">
+
+        <div id="map"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  // ============================
+  // MAP INITIALIZATION
+  // ============================
+
+  const map = L.map('map').setView(
+    [4.2105, 101.9758],
+    6
+  );
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution:'OpenStreetMap'
+    }
+  ).addTo(map);
+
+  let currentSatelliteLayer = null;
+  let currentDownloadURL = null;
+
+  // ============================
+  // UI ELEMENTS
+  // ============================
+
+  const floodPercentageSpan =
+    document.getElementById('floodPercentage');
+
+  const floodMessageP =
+    document.getElementById('floodMessage');
+
+  const ndwiStatusSpan =
+    document.getElementById('ndwiStatus');
+
+  const riskBadgeSpan =
+    document.getElementById('riskBadge');
+
+  const notificationsDiv =
+    document.getElementById('notificationsList');
+
+  // ============================
+  // UPDATE RISK COLOR
+  // ============================
+
+  function updateRiskClass(level){
+
+    riskBadgeSpan.className = 'risk-level';
+
+    if(level === 'High'){
+      riskBadgeSpan.classList.add('risk-high');
+    }
+
+    else if(level === 'Moderate'){
+      riskBadgeSpan.classList.add('risk-moderate');
+    }
+
+    else{
+      riskBadgeSpan.classList.add('risk-low');
+    }
+
+    riskBadgeSpan.innerText =
+      level + ' Risk';
+  }
+
+  // ============================
+  // SEARCH FUNCTION
+  // ============================
+
+  async function searchFloodLocation(){
+
+    const location =
+      document
+      .getElementById('locationSearch')
+      .value;
+
+    if(!location){
+      alert("Please enter location");
+      return;
+    }
+
+    floodPercentageSpan.innerText = "...";
+
+    floodMessageP.innerText =
+      "Connecting to Google Earth Engine...";
+
+    try{
+
+      const response = await fetch(
+        'http://127.0.0.1:5000/search-location',
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':'application/json'
+          },
+
+          body:JSON.stringify({
+            location:location
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      // remove previous layer
+      if(currentSatelliteLayer){
+        map.removeLayer(currentSatelliteLayer);
+      }
+
+      // add satellite imagery
+      currentSatelliteLayer = L.tileLayer(
+        data.tile_url,
+        {
+          attribution:'Google Earth Engine'
+        }
+      ).addTo(map);
+
+      // zoom location
+      map.setView(
+        [data.latitude, data.longitude],
+        10
+      );
+
+      currentDownloadURL =
+        data.download_url;
+
+      // update UI
+      floodPercentageSpan.innerText =
+        data.flood_probability + "%";
+
+      floodMessageP.innerText =
+        "Real-time Sentinel-1 flood detection generated successfully.";
+
+      ndwiStatusSpan.innerText =
+        "NDWI Index: " + data.ndwi;
+
+      updateRiskClass(
+        data.risk_level
+      );
+
+      notificationsDiv.innerHTML = `
+        <div class="notif-item">
+          🌊 Flood probability detected:
+          ${data.flood_probability}%
+        </div>
+
+        <div class="notif-item">
+          📡 Satellite imagery loaded
+          successfully from Google Earth Engine.
+        </div>
+
+        <div class="notif-item">
+          💧 NDWI Analysis:
+          ${data.ndwi}
+        </div>
+      `;
+
+    }
+
+    catch(error){
+
+      console.error(error);
+
+      floodMessageP.innerText =
+        "Earth Engine connection failed.";
+
+    }
+
+  }
+
+  // ============================
+  // SEARCH BUTTON
+  // ============================
+
+  document
+    .getElementById('searchBtn')
+    .addEventListener(
+      'click',
+      searchFloodLocation
+    );
+
+  // ============================
+  // ENTER KEY SUPPORT
+  // ============================
+
+  document
+    .getElementById('locationSearch')
+    .addEventListener(
+      'keypress',
+      function(e){
+
+        if(e.key === 'Enter'){
+          searchFloodLocation();
+        }
+
+      }
+    );
+
+  // ============================
+  // DOWNLOAD TIFF
+  // ============================
+
+  document
+    .getElementById('downloadTifBtn')
+    .addEventListener(
+      'click',
+      () => {
+
+        if(currentDownloadURL){
+
+          window.open(currentDownloadURL);
+
+        }
+
+        else{
+
+          alert(
+            "No GeoTIFF available yet."
+          );
+
+        }
+
+      }
+    );
+
+</script>
+
+</body>
+</html>
